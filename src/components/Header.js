@@ -1,40 +1,24 @@
-import React, {useEffect} from 'react';
-import {Text, View, StyleSheet, TouchableOpacity, Image, SafeAreaView} from "react-native";
-import Constants from "expo-constants";
+import React from 'react';
+import { StyleSheet, TouchableOpacity } from "react-native";
 import { MaterialIcons as Icon } from '@expo/vector-icons';
 import { useNavigation } from "@react-navigation/native";
-import api from "../services/api";
 
-const Header = ({stateButton, tokenParams, createOrEdit}) => {
+const Header = ({ createOrEdit }) => {
   const navigation = useNavigation();
 
-  function handleNavigateToCreate() {
-    navigation.navigate('CreateOrUpdateItem', {tokenParams, createOrEdit});
+  async function handleNavigateToCreate() {
+    navigation.navigate('CreateOrUpdateItem', { createOrEdit });
   }
 
   return (
-    <View style={styles.container}>
-      <Image style={styles.title} source={require('../assets/logoMM.png')} />
-      {stateButton == false &&
-      <TouchableOpacity onPress={handleNavigateToCreate} disabled={stateButton}>
+      <TouchableOpacity onPress={handleNavigateToCreate}>
         <Icon style={styles.icon} name="add" size={32} color="#34cb79" />
-      </TouchableOpacity>}
-    </View>
+      </TouchableOpacity>
+
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    backgroundColor: '#192537',
-    paddingTop: Constants.statusBarHeight,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    height: 65,
-  },
-  title: {
-    height: 40,
-    resizeMode: 'cover',
-  },
   icon: {
     padding: 5
   }

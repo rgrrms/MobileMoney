@@ -3,20 +3,23 @@ import { Text, View, StyleSheet, TouchableOpacity } from "react-native";
 import { AntDesign as Icon } from '@expo/vector-icons';
 import { useNavigation } from "@react-navigation/native";
 import api from "../services/api";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const Item = ({ dataFinances, tokenParams, createOrEdit }) => {
+const Item = ({ dataFinances, createOrEdit }) => {
 
   const navigation = useNavigation();
 
   const handleEdit = (id) => {
     console.log(`id ${id}`)
-    navigation.navigate('CreateOrUpdateItem', {id, tokenParams, createOrEdit});
+    navigation.navigate('CreateOrUpdateItem', {id, createOrEdit});
   }
 
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
+    const token = await AsyncStorage.getItem('token')
+
     api.delete(`/removeBalance/${id}`, {
       headers: {
-        "x-access-token": tokenParams.token
+        "x-access-token": token
       }}).then(r => {
         console.log(r);
     });

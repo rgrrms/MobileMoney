@@ -5,6 +5,7 @@ import api from "../services/api";
 import { useNavigation } from "@react-navigation/native";
 import {TextInput} from "react-native";
 import { Foundation } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Login = () => {
   const [cpf, setCpf] = useState('');
@@ -16,6 +17,7 @@ const Login = () => {
     e.preventDefault();
     if (cpf && pass) {
       const response = await api.post("login",{ "cpf": cpf, "pass": pass });
+      AsyncStorage.setItem('token', response.data.token);
       navigation.navigate('TimeLine', response.data);
     }
   }
@@ -35,7 +37,6 @@ const Login = () => {
       </View>
       <Text style={styles.titleApp}>MobileMoney</Text>
       <Text style={styles.slogan}>G E R E N C I E   E   C O N Q U I S T E !</Text>
-      {/*<Image style={styles.image} source={require('../assets/logoMM.png')} />*/}
       <TextInput style={styles.input} placeholder="CPF" placeholderTextColor="#fff" value={cpf} onChangeText={e => setCpf(e)}/>
       <TextInput style={styles.input} placeholder="Senha" placeholderTextColor="#fff" value={pass} secureTextEntry={true}  onChangeText={e => setPass(e)}/>
       <TouchableOpacity onPress={handleLogin} style={styles.button}>
