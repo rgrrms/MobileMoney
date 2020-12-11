@@ -84,7 +84,6 @@ const TimeLine = () => {
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <Header stateButton={false} tokenParams={routeParams} createOrEdit={"create"}/>
       <ScrollView style={styles.container}>
         <View style={styles.containerMonthYear}>
           <TouchableOpacity onPress={() => count("-")}>
