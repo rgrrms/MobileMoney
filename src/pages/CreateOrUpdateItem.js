@@ -73,7 +73,7 @@ const CreateOrUpdateItem = () => {
           "value": Number(amount),
           "category": category,
           "year": date.split('/')[2],
-          "month": date.split('/')[1],
+          "month": String(date.split('/')[1]),
           "day": date.split('/')[0],
           "yearMonth": `${date.split('/')[2]}-${date.split('/')[1]}`,
           "yearMonthDay": `${date.split('/')[2]}-${date.split('/')[1]}-${date.split('/', 1)}`,
