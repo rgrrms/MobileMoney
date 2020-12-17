@@ -4,6 +4,8 @@ import {AntDesign as Icon, MaterialCommunityIcons as IconM} from "@expo/vector-i
 import api from "../services/api";
 import { useNavigation } from "@react-navigation/native";
 import {TextInput} from "react-native";
+import { Foundation } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Login = () => {
   const [cpf, setCpf] = useState('');
@@ -15,6 +17,7 @@ const Login = () => {
     e.preventDefault();
     if (cpf && pass) {
       const response = await api.post("login",{ "cpf": cpf, "pass": pass });
+      AsyncStorage.setItem('token', response.data.token);
       navigation.navigate('TimeLine', response.data);
     }
   }
@@ -25,7 +28,15 @@ const Login = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Image style={styles.image} source={require('../assets/logoMM.png')} />
+      <View style={styles.lineIcon}>
+        <Text style={styles.line}></Text>
+        <View style={styles.viewIcon}>
+          <Foundation name="dollar" size={28} color="#34CB79" />
+        </View>
+        <Text style={styles.line}></Text>
+      </View>
+      <Text style={styles.titleApp}>MobileMoney</Text>
+      <Text style={styles.slogan}>G E R E N C I E   E   C O N Q U I S T E !</Text>
       <TextInput style={styles.input} placeholder="CPF" placeholderTextColor="#fff" value={cpf} onChangeText={e => setCpf(e)}/>
       <TextInput style={styles.input} placeholder="Senha" placeholderTextColor="#fff" value={pass} secureTextEntry={true}  onChangeText={e => setPass(e)}/>
       <TouchableOpacity onPress={handleLogin} style={styles.button}>
@@ -51,7 +62,8 @@ const styles = StyleSheet.create({
     height: 200
   },
   image: {
-    marginBottom: 10
+    marginBottom: 10,
+    marginTop: 50
   },
   input: {
     fontSize: 28,
@@ -78,6 +90,37 @@ const styles = StyleSheet.create({
   },
   icon: {
     paddingTop: 5
+  },
+  titleApp: {
+    fontFamily: 'Cinzel_700Bold',
+    color: '#fff',
+    fontSize: 42
+  },
+  slogan: {
+    fontFamily: 'JosefinSans_400Regular',
+    color: '#34CB79',
+    fontSize: 16,
+    marginBottom: 10,
+  },
+  line: {
+    borderBottomWidth: 2,
+    borderColor: '#34CB79',
+    width: 130,
+    marginBottom: 8
+  },
+  viewIcon: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 30,
+    height: 30,
+    borderRadius: 50,
+    borderWidth: 2,
+    borderColor: '#34CB79',
+    marginRight: 10,
+    marginLeft: 10
+  },
+  lineIcon: {
+    flexDirection: 'row',
   }
 });
 

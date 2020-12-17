@@ -1,10 +1,10 @@
 import React, {useEffect, useState} from 'react';
 import {SafeAreaView, StyleSheet, Text, View, TextInput, TouchableOpacity} from "react-native";
-import Header from "../components/Header";
 import { RadioButton } from 'react-native-paper';
 import {useNavigation, useRoute} from "@react-navigation/native";
 import api from "../services/api";
 import {MaterialCommunityIcons as Icon} from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const CreateOrUpdateItem = () => {
   const [category, setCategory] = useState();
@@ -20,32 +20,36 @@ const CreateOrUpdateItem = () => {
   const navigation = useNavigation();
 
   useEffect(() => {
-    console.log(`router2, ${routeParams.id}, ${routeParams.createOrEdit}, ${routeParams.tokenParams.token}`)
-    if (routeParams.createOrEdit !== 'create') {
-      console.log(route.params)
-      api.get(`/oneFinance/${routeParams.id}`, {
-        headers: {
-          "x-access-token": routeParams.tokenParams.token
-        }}).then(response => {
-        response.data.map(item => {
-          setCategory(item.category);
-          setDescription(item.description);
-          setAmount(String(item.value));
-          setDate(`${item.day}/${item.month}/${item.year}`);
-          setChecked(item.type === '+' ? 'revenue' : 'expense');
-        });
-      })
-    }
+    AsyncStorage.getItem('token').then(token => {
+      console.log(token);
+      console.log(`router2, ${routeParams.id}, ${routeParams.createOrEdit}`)
+      if (routeParams.createOrEdit !== 'create') {
+        console.log(route.params)
+        api.get(`/oneFinance/${routeParams.id}`, {
+          headers: {
+            "x-access-token": token
+          }}).then(response => {
+          response.data.map(item => {
+            setCategory(item.category);
+            setDescription(item.description);
+            setAmount(String(item.value));
+            setDate(`${item.day}/${item.month}/${item.year}`);
+            setChecked(item.type === '+' ? 'revenue' : 'expense');
+          });
+        })
+      }
+    })
   }, [])
 
   async function handleCreateItem(e) {
     e.preventDefault();
+    const token = await AsyncStorage.getItem('token')
     if (!category || !description || !amount || !date || !checked) {
       alert("Todos os campos são obrigatórios!");
     }
     else {
       if (routeParams.createOrEdit === 'create') {
-        console.log("Create", routeParams.tokenParams.token);
+        console.log("Create", token);
         await api.post(`/createBalance`, {
           "description": description,
           "value": Number(amount),
@@ -58,7 +62,7 @@ const CreateOrUpdateItem = () => {
           "type": checked === 'expense' ? '-' : '+'
         }, {
           headers: {
-            "x-access-token": routeParams.tokenParams.token
+            "x-access-token": token
           }
         }).then(response => {
           console.log(response)
@@ -67,7 +71,7 @@ const CreateOrUpdateItem = () => {
         navigation.navigate('TimeLine');
       }
       else {
-        console.log("Create", routeParams.tokenParams.token);
+        console.log("Update", token);
         await api.put(`/updateBalance/${routeParams.id}`, {
           "description": description,
           "value": Number(amount),
@@ -80,7 +84,7 @@ const CreateOrUpdateItem = () => {
           "type": checked === 'expense' ? '-' : '+'
         }, {
           headers: {
-            "x-access-token": routeParams.tokenParams.token
+            "x-access-token": token
           }
         }).then(response => {
           console.log(response)
@@ -98,7 +102,6 @@ const CreateOrUpdateItem = () => {
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <Header stateButton={true}/>
       <View style={styles.container}>
         <TextInput style={styles.input} placeholder="Categoria" value={category} onChangeText={e => setCategory(e)}/>
         <TextInput style={styles.input} placeholder="Descrição" value={description} onChangeText={e => setDescription(e)}/>

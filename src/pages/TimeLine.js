@@ -10,7 +10,6 @@ import {
 } from "react-native";
 import Values from "../components/Values";
 import Item from "../components/Item";
-import Header from "../components/Header";
 import api from "../services/api";
 import {useRoute} from "@react-navigation/native";
 import {AntDesign as Icon} from "@expo/vector-icons";
@@ -84,7 +83,6 @@ const TimeLine = () => {
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <Header stateButton={false} tokenParams={routeParams} createOrEdit={"create"}/>
       <ScrollView style={styles.container}>
         <View style={styles.containerMonthYear}>
           <TouchableOpacity onPress={() => count("-")}>
