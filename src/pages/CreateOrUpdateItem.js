@@ -3,14 +3,15 @@ import {SafeAreaView, StyleSheet, Text, View, TextInput, TouchableOpacity} from 
 import { RadioButton } from 'react-native-paper';
 import {useNavigation, useRoute} from "@react-navigation/native";
 import api from "../services/api";
-import {MaterialCommunityIcons as Icon} from "@expo/vector-icons";
+import {MaterialCommunityIcons as Icon, FontAwesome as IconF} from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { maskData, maskAmount } from "../utils/maskCPF";
 
 const CreateOrUpdateItem = () => {
   const [category, setCategory] = useState();
   const [description, setDescription] = useState();
   const [amount, setAmount] = useState();
-  const [date, setDate] = useState(new Date());
+  const [date, setDate] = useState();
   const [checked, setChecked] = React.useState('expense');
 
   const route = useRoute();
@@ -21,22 +22,23 @@ const CreateOrUpdateItem = () => {
 
   useEffect(() => {
     AsyncStorage.getItem('token').then(token => {
-      console.log(token);
-      console.log(`router2, ${routeParams.id}, ${routeParams.createOrEdit}`)
       if (routeParams.createOrEdit !== 'create') {
-        console.log(route.params)
-        api.get(`/oneFinance/${routeParams.id}`, {
-          headers: {
-            "x-access-token": token
-          }}).then(response => {
-          response.data.map(item => {
-            setCategory(item.category);
-            setDescription(item.description);
-            setAmount(String(item.value));
-            setDate(`${item.day}/${item.month}/${item.year}`);
-            setChecked(item.type === '+' ? 'revenue' : 'expense');
+        try {
+          api.get(`/oneFinance/${routeParams.id}`, {
+            headers: {
+              "x-access-token": token
+            }}).then(response => {
+            response.data.map(item => {
+              setCategory(item.category);
+              setDescription(item.description);
+              setAmount(String(item.value));
+              setDate(`${item.day}/${item.month}/${item.year}`);
+              setChecked(item.type === '+' ? 'revenue' : 'expense');
+            });
           });
-        })
+        } catch (e) {
+          alert(e.response.data.message)
+        }
       }
     })
   }, [])
@@ -48,51 +50,70 @@ const CreateOrUpdateItem = () => {
       alert("Todos os campos são obrigatórios!");
     }
     else {
+      let amountNumber = amount.split(' ')[1];
+      amountNumber = amountNumber.replace('.','');
+      amountNumber = Number(amountNumber.replace(',','.'));
       if (routeParams.createOrEdit === 'create') {
-        console.log("Create", token);
-        await api.post(`/createBalance`, {
-          "description": description,
-          "value": Number(amount),
-          "category": category,
-          "year": date.split('/')[2],
-          "month": date.split('/')[1],
-          "day": date.split('/')[0],
-          "yearMonth": `${date.split('/')[2]}-${date.split('/')[1]}`,
-          "yearMonthDay": `${date.split('/')[2]}-${date.split('/')[1]}-${date.split('/', 1)}`,
-          "type": checked === 'expense' ? '-' : '+'
-        }, {
-          headers: {
-            "x-access-token": token
-          }
-        }).then(response => {
-          console.log(response)
-        });
-        alert("Dados salvos com sucesso!");
-        navigation.navigate('TimeLine');
+        try {
+          await api.post(`/createBalance`, {
+            "description": description,
+            "value": amount,
+            "valueInNumber": amountNumber,
+            "category": category,
+            "year": date.split('/')[2],
+            "month": date.split('/')[1],
+            "day": date.split('/')[0],
+            "yearMonth": `${date.split('/')[2]}-${date.split('/')[1]}`,
+            "yearMonthDay": `${date.split('/')[2]}-${date.split('/')[1]}-${date.split('/', 1)}`,
+            "type": checked === 'expense' ? '-' : '+'
+          }, {
+            headers: {
+              "x-access-token": token
+            }
+          }).then(response => {
+            alert("Dados salvos com sucesso!");
+            navigation.navigate('TimeLine');
+          });
+        } catch (e) {
+          alert(e.response.data.message)
+        }
       }
       else {
-        console.log("Update", token);
-        await api.put(`/updateBalance/${routeParams.id}`, {
-          "description": description,
-          "value": Number(amount),
-          "category": category,
-          "year": date.split('/')[2],
-          "month": date.split('/')[1],
-          "day": date.split('/')[0],
-          "yearMonth": `${date.split('/')[2]}-${date.split('/')[1]}`,
-          "yearMonthDay": `${date.split('/')[2]}-${date.split('/')[1]}-${date.split('/', 1)}`,
-          "type": checked === 'expense' ? '-' : '+'
-        }, {
-          headers: {
-            "x-access-token": token
-          }
-        }).then(response => {
-          console.log(response)
-        });
-        alert("Dados salvos com sucesso!");
-        navigation.navigate('TimeLine');
+        try {
+          await api.put(`/updateBalance/${routeParams.id}`, {
+            "description": description,
+            "value": amount,
+            "valueInNumber": amountNumber,
+            "category": category,
+            "year": date.split('/')[2],
+            "month": date.split('/')[1],
+            "day": date.split('/')[0],
+            "yearMonth": `${date.split('/')[2]}-${date.split('/')[1]}`,
+            "yearMonthDay": `${date.split('/')[2]}-${date.split('/')[1]}-${date.split('/', 1)}`,
+            "type": checked === 'expense' ? '-' : '+'
+          }, {
+            headers: {
+              "x-access-token": token
+            }
+          }).then(response => {
+            alert("Dados salvos com sucesso!");
+            navigation.navigate('TimeLine');
+          });
+        } catch (e) {
+          alert(e.response.data.message)
+        }
       }
     }
+  }
+
+  function handleChangeData(value) {
+    const mask = maskData(value);
+    setDate(mask);
+  }
+
+  function handleChangeAmount(value) {
+    const mask = maskAmount(value);
+    setAmount(mask);
   }
 
   function handleReturn(e) {
@@ -103,10 +124,10 @@ const CreateOrUpdateItem = () => {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <View style={styles.container}>
-        <TextInput style={styles.input} placeholder="Categoria" value={category} onChangeText={e => setCategory(e)}/>
-        <TextInput style={styles.input} placeholder="Descrição" value={description} onChangeText={e => setDescription(e)}/>
-        <TextInput style={styles.input} placeholder="Valor" value={amount} onChangeText={e => setAmount(e)}/>
-        <TextInput style={styles.input} placeholder="Data(DD/MM/AAAA)" value={date} onChangeText={e => setDate(e)}/>
+        <TextInput style={styles.input} placeholder="Categoria" maxLength={15} value={category} onChangeText={e => setCategory(e)}/>
+        <TextInput style={styles.input} placeholder="Descrição" maxLength={40} value={description} onChangeText={e => setDescription(e)}/>
+        <TextInput style={styles.input} placeholder="Valor" maxLength={15} value={amount} onChangeText={e => handleChangeAmount(e)}/>
+        <TextInput style={styles.input} placeholder="Data(DD/MM/AAAA)" minLength={10} maxLength={10} value={date} onChangeText={e => handleChangeData(e)}/>
         <View style={styles.row}>
           <View style={styles.row}>
             <RadioButton
@@ -128,7 +149,7 @@ const CreateOrUpdateItem = () => {
         <View style={styles.row}>
           <TouchableOpacity style={styles.button} onPress={handleCreateItem}>
             <Text style={styles.text}>Salvar</Text>
-            <Icon name="account-plus-outline" size={38} color="#34cb79" />
+            <IconF name="save" size={38} color="#34cb79" />
           </TouchableOpacity>
           <TouchableOpacity style={styles.button} onPress={handleReturn}>
             <Text style={styles.text}>Voltar</Text>
@@ -165,7 +186,6 @@ const styles = StyleSheet.create({
     padding: 5,
     margin: 10,
     borderColor: '#34cb79',
-    width: 170,
     justifyContent: 'center'
   },
   text: {
