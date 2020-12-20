@@ -30,8 +30,9 @@ const TimeLine = () => {
   const route = useRoute();
 
   const [value, setValue] = useState('0')
+
   const [data, setData] = useState(Data[value]);
-  const [dataFormat, setDataFormat] = useState(DataFormat[value]);
+  const [dataFormat, setDataFormat] = useState(DataFormat[Number(value)]);
 
   const [filter, setFilter] = useState();
 
