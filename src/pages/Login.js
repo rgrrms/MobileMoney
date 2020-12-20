@@ -1,25 +1,33 @@
 import React, { useState } from 'react';
-import {Text, View, TouchableOpacity, ScrollView, SafeAreaView, StyleSheet, Image} from "react-native";
+import {Text, View, TouchableOpacity, SafeAreaView, TextInput, StyleSheet} from "react-native";
 import {AntDesign as Icon, MaterialCommunityIcons as IconM} from "@expo/vector-icons";
 import api from "../services/api";
 import { useNavigation } from "@react-navigation/native";
-import {TextInput} from "react-native";
 import { Foundation } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { maskCPF } from "../utils/maskCPF";
 
 const Login = () => {
   const [cpf, setCpf] = useState('');
   const [pass, setPass] = useState('');
 
   const navigation = useNavigation();
-
   async function handleLogin(e) {
     e.preventDefault();
     if (cpf && pass) {
-      const response = await api.post("login",{ "cpf": cpf, "pass": pass });
-      AsyncStorage.setItem('token', response.data.token);
-      navigation.navigate('TimeLine', response.data);
+      try {
+        const response = await api.post("login",{ "cpf": cpf, "pass": pass });
+        AsyncStorage.setItem('token', response.data.token);
+        navigation.navigate('TimeLine', response.data);
+      } catch (e) {
+        alert(e.response.data.message)
+      }
     }
+  }
+
+  async function handleChange(e) {
+    const mask = maskCPF(e)
+    setCpf(mask)
   }
 
   async function handleCreateUser() {
@@ -37,7 +45,8 @@ const Login = () => {
       </View>
       <Text style={styles.titleApp}>MobileMoney</Text>
       <Text style={styles.slogan}>G E R E N C I E   E   C O N Q U I S T E !</Text>
-      <TextInput style={styles.input} placeholder="CPF" placeholderTextColor="#fff" value={cpf} onChangeText={e => setCpf(e)}/>
+      {/*<Input placeholder="CPF" />*/}
+      <TextInput style={styles.input} placeholder="CPF" placeholderTextColor="#fff" value={cpf} minLength={14} maxLength={14} onChangeText={e => handleChange(e)}/>
       <TextInput style={styles.input} placeholder="Senha" placeholderTextColor="#fff" value={pass} secureTextEntry={true}  onChangeText={e => setPass(e)}/>
       <TouchableOpacity onPress={handleLogin} style={styles.button}>
         <Text style={styles.text}>Login</Text>

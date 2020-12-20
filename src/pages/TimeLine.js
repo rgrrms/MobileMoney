@@ -13,6 +13,7 @@ import Item from "../components/Item";
 import api from "../services/api";
 import {useRoute} from "@react-navigation/native";
 import {AntDesign as Icon} from "@expo/vector-icons";
+import { maskAmountBack } from "../utils/maskCPF";
 
 const Data = ["11/2020","12/2020","01/2021","02/2021","03/2021","04/2021","05/2021"]
 const DataFormat = ["2020-11","2020-12","2021-01","2021-02","2021-03","2021-04","2021-05"]
@@ -28,7 +29,8 @@ const TimeLine = () => {
 
   const route = useRoute();
 
-  const [value, setValue] = useState("0")
+  const [value, setValue] = useState('0')
+
   const [data, setData] = useState(Data[value]);
   const [dataFormat, setDataFormat] = useState(DataFormat[Number(value)]);
 
@@ -37,7 +39,7 @@ const TimeLine = () => {
   const routeParams = route.params;
 
   function count(sinal) {
-    let v = value;
+    let v = +value;
     if (sinal === "+") {
       v++;
       setData(Data[v]);
@@ -61,24 +63,26 @@ const TimeLine = () => {
   }, [filter])
 
   useEffect(() => {
-  console.log('params1',routeParams);
-    api.get(`/finances/${dataFormat}`, {
-      headers: {
-        "x-access-token": routeParams.token
-      }}).then(response => {
-      console.log(response)
-      setFinances(response.data)
-      setFinancesFilter(response.data)
-    });
-    api.get(`/values/${dataFormat}`, {
-      headers: {
-        "x-access-token": routeParams.token
-      }}).then(response => {
-      setBalance(response.data.saldo);
-      setNumberPut(response.data.quantidadeLançamentos);
-      setExpense(response.data.despesa);
-      setRevenue(response.data.receita);
-    });
+    try {
+      api.get(`/finances/${dataFormat}`, {
+        headers: {
+          "x-access-token": routeParams.token
+        }}).then(response => {
+        setFinances(response.data)
+        setFinancesFilter(response.data)
+      });
+      api.get(`/values/${dataFormat}`, {
+        headers: {
+          "x-access-token": routeParams.token
+        }}).then(response => {
+        setBalance(maskAmountBack(response.data.saldo));
+        setNumberPut(response.data.quantidadeLançamentos);
+        setExpense(maskAmountBack(response.data.despesa));
+        setRevenue(maskAmountBack(response.data.receita));
+      });
+    } catch (e) {
+      alert(e.response.data.message)
+    }
   }, [dataFormat]);
 
   return (

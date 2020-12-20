@@ -3,6 +3,7 @@ import {View, Text, TouchableOpacity, TextInput, SafeAreaView, StyleSheet} from 
 import api from "../services/api";
 import { MaterialCommunityIcons as Icon } from "@expo/vector-icons";
 import {useNavigation} from "@react-navigation/native";
+import { maskCPF } from "../utils/maskCPF";
 
 const CreateAccount = () => {
   const [name, setName] = useState('');
@@ -16,13 +17,20 @@ const CreateAccount = () => {
     e.preventDefault();
     if (!name || !cpf || !pass || !email) {
       alert("Todos os campos são obrigatórios!");
-      console.log("Todos os campos são obrigatórios!");
     } else {
-      console.log("Create");
-      const res = await api.post(`/createAccount`, {"name": name, "pass": pass, "cpf": cpf, "email": email});
-      alert(`Usuário ${name} criado com sucesso!`)
-      navigation.navigate('Login');
+      try {
+        const res = await api.post(`/createAccount`, {"name": name, "pass": pass, "cpf": cpf, "email": email});
+        alert(`Usuário ${name} criado com sucesso!`)
+        navigation.navigate('Login');
+      } catch (e) {
+        alert(e.response.data.message)
+      }
     }
+  }
+
+  async function handleChange(e) {
+    const mask = maskCPF(e)
+    setCpf(mask)
   }
 
   function handleReturn(e) {
@@ -34,9 +42,9 @@ const CreateAccount = () => {
     <SafeAreaView style={styles.container}>
       <View style={styles.containerCard}>
         <TextInput style={styles.input} placeholder="Nome" value={name} onChangeText={e => setName(e)}/>
-        <TextInput style={styles.input} placeholder="CPF" value={cpf} onChangeText={e => setCpf(e)}/>
+        <TextInput style={styles.input} placeholder="CPF" value={cpf} minLength={14} maxLength={14} onChangeText={e => handleChange(e)}/>
         <TextInput style={styles.input} placeholder="Senha" value={pass} onChangeText={e => setPass(e)}/>
-        <TextInput style={styles.input} placeholder="Email" value={email} onChangeText={e => setEmail(e)}/>
+        <TextInput style={styles.input} placeholder="Email" value={email} keyboardType="email-address" onChangeText={e => setEmail(e)}/>
         <View style={styles.containerButtons}>
           <TouchableOpacity style={styles.button} onPress={handleCreateAccount}>
             <Text style={styles.text}>Criar</Text>
@@ -78,7 +86,6 @@ const styles = StyleSheet.create({
     padding: 5,
     margin: 10,
     borderColor: '#34cb79',
-    width: 170,
     justifyContent: 'center'
   },
   text: {

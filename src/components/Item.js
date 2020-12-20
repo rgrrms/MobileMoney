@@ -10,19 +10,21 @@ const Item = ({ dataFinances, createOrEdit }) => {
   const navigation = useNavigation();
 
   const handleEdit = (id) => {
-    console.log(`id ${id}`)
     navigation.navigate('CreateOrUpdateItem', {id, createOrEdit});
   }
 
   const handleDelete = async (id) => {
     const token = await AsyncStorage.getItem('token')
-
-    api.delete(`/removeBalance/${id}`, {
-      headers: {
-        "x-access-token": token
-      }}).then(r => {
-        console.log(r);
-    });
+    try {
+      api.delete(`/removeBalance/${id}`, {
+        headers: {
+          "x-access-token": token
+        }}).then(r => {
+        alert(r.data.message);
+      });
+    } catch (e) {
+      alert(e.response.data.message)
+    }
   }
 
   return (
@@ -70,8 +72,11 @@ const styles = StyleSheet.create({
     padding: 5,
     justifyContent: 'space-between'
   },
+  containerInfo: {
+    maxWidth: 120
+  },
   containerCard: {
-    justifyContent: 'center'
+    justifyContent: 'center',
   },
   day: {
     fontSize: 20,
