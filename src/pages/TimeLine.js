@@ -11,7 +11,7 @@ import {
 import Values from "../components/Values";
 import Item from "../components/Item";
 import api from "../services/api";
-import {useRoute} from "@react-navigation/native";
+import {useNavigation, useRoute} from "@react-navigation/native";
 import {AntDesign as Icon} from "@expo/vector-icons";
 import { maskAmountBack } from "../utils/maskCPF";
 
@@ -29,12 +29,16 @@ const TimeLine = () => {
 
   const route = useRoute();
 
+  const navigation = useNavigation();
+
   const [value, setValue] = useState('0')
 
   const [data, setData] = useState(Data[value]);
   const [dataFormat, setDataFormat] = useState(DataFormat[Number(value)]);
 
   const [filter, setFilter] = useState();
+
+  const [updateNewList, setUpdateNewList] = useState(0);
 
   const routeParams = route.params;
 
@@ -52,6 +56,17 @@ const TimeLine = () => {
       setValue(v);
     }
   }
+
+  function reloadDeleted() {
+    setUpdateNewList(updateNewList + 1);
+  }
+
+  useEffect(() => {
+    navigation.addListener('focus', ()=> {
+      console.log(routeParams)
+      routeParams.updateList == true ? setUpdateNewList(updateNewList + 1) : false;
+    })
+  }, []);
 
   useEffect(() => {
     const search = filter;
@@ -83,7 +98,7 @@ const TimeLine = () => {
     } catch (e) {
       alert(e.response.data.message)
     }
-  }, [dataFormat]);
+  }, [dataFormat, updateNewList]);
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -110,7 +125,7 @@ const TimeLine = () => {
         <View style={styles.list}>
           {financesFilter?.map(item => {
             return (
-              <Item key={item._id} dataFinances={item} tokenParams={routeParams} createOrEdit={"edit"}/>
+              <Item key={item._id} dataFinances={item} tokenParams={routeParams} functionReloadDeleted={reloadDeleted} createOrEdit={"edit"}/>
             )
           })}
         </View>
