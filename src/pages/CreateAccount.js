@@ -1,9 +1,10 @@
 import React, {useState} from 'react';
-import {View, Text, TouchableOpacity, TextInput, SafeAreaView, StyleSheet} from "react-native";
+import {View, Text, TouchableOpacity,ScrollView, TextInput, SafeAreaView, KeyboardAvoidingView} from "react-native";
 import api from "../services/api";
 import { MaterialCommunityIcons as Icon } from "@expo/vector-icons";
 import {useNavigation} from "@react-navigation/native";
 import { maskCPF } from "../utils/maskCPF";
+import EStyleSheet from 'react-native-extended-stylesheet';
 
 const CreateAccount = () => {
   const [name, setName] = useState('');
@@ -40,57 +41,59 @@ const CreateAccount = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.containerCard}>
-        <TextInput style={styles.input} placeholder="Nome" value={name} onChangeText={e => setName(e)}/>
-        <TextInput style={styles.input} placeholder="CPF" value={cpf} minLength={14} maxLength={14} onChangeText={e => handleChange(e)}/>
-        <TextInput style={styles.input} placeholder="Senha" value={pass} onChangeText={e => setPass(e)}/>
-        <TextInput style={styles.input} placeholder="Email" value={email} keyboardType="email-address" onChangeText={e => setEmail(e)}/>
-        <View style={styles.containerButtons}>
-          <TouchableOpacity style={styles.button} onPress={handleCreateAccount}>
-            <Text style={styles.text}>Criar</Text>
-            <Icon name="account-plus-outline" size={38} color="#34cb79" />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.button} onPress={handleReturn}>
-            <Text style={styles.text}>Voltar</Text>
-            <Icon name="keyboard-return" size={38} color="#34cb79" />
-          </TouchableOpacity>
+      <ScrollView>
+        <View style={styles.containerCard}>
+          <TextInput style={styles.input} placeholder="Nome" value={name} onChangeText={e => setName(e)}/>
+          <TextInput style={styles.input} placeholder="CPF" value={cpf} minLength={14} maxLength={14} onChangeText={e => handleChange(e)}/>
+          <TextInput style={styles.input} placeholder="Senha" value={pass} onChangeText={e => setPass(e)}/>
+          <TextInput style={styles.input} placeholder="Email" value={email} keyboardType="email-address" onChangeText={e => setEmail(e)}/>
+          <View style={styles.containerButtons}>
+            <TouchableOpacity style={styles.button} onPress={handleCreateAccount}>
+              <Text style={styles.text}>Criar</Text>
+              <Icon name="account-plus-outline" size={38} color="#34cb79" />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.button} onPress={handleReturn}>
+              <Text style={styles.text}>Voltar</Text>
+              <Icon name="keyboard-return" size={38} color="#34cb79" />
+            </TouchableOpacity>
+          </View>
         </View>
-      </View>
+      </ScrollView>
     </SafeAreaView>
   )
 }
 
-const styles = StyleSheet.create({
+const styles = EStyleSheet.create({
   container: {
     flex: 1,
   },
   containerCard: {
-    padding: 10
+    padding: '0.8rem'
   },
   input: {
     borderBottomWidth: 1,
-    marginTop: 10,
-    marginBottom: 10,
-    height: 40,
-    fontSize: 22,
+    marginTop: '0.8rem',
+    marginBottom: '0.8rem',
+    height: '3rem',
+    fontSize: '2rem'
   },
   containerButtons: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: 20
+    marginTop: '1rem'
   },
   button: {
     borderWidth: 1,
-    borderRadius: 10,
+    borderRadius: '0.62rem',
     flexDirection: 'row',
-    padding: 5,
-    margin: 10,
+    padding: '0.3rem',
+    margin: '0.62rem',
     borderColor: '#34cb79',
     justifyContent: 'center'
   },
   text: {
-    fontSize: 28,
-    marginRight: 10,
+    fontSize: '1.75rem',
+    marginRight: '0.62rem',
   }
 })
 

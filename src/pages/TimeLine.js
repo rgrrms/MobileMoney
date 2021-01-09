@@ -1,19 +1,12 @@
 import React, {useEffect, useState} from 'react';
-import {
-  StyleSheet,
-  SafeAreaView,
-  Text,
-  View,
-  ScrollView,
-  TouchableOpacity,
-  TextInput
-} from "react-native";
+import { SafeAreaView, Text, View, ScrollView, TouchableOpacity, TextInput } from "react-native";
 import Values from "../components/Values";
 import Item from "../components/Item";
 import api from "../services/api";
 import {useRoute} from "@react-navigation/native";
 import {AntDesign as Icon} from "@expo/vector-icons";
 import { maskAmountBack } from "../utils/maskCPF";
+import EStyleSheet from 'react-native-extended-stylesheet';
 
 const Data = ["11/2020","12/2020","01/2021","02/2021","03/2021","04/2021","05/2021"]
 const DataFormat = ["2020-11","2020-12","2021-01","2021-02","2021-03","2021-04","2021-05"]
@@ -119,32 +112,32 @@ const TimeLine = () => {
   )
 }
 
-const styles = StyleSheet.create({
+const styles = EStyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    paddingLeft: 20,
-    paddingRight: 20,
+    paddingLeft: '1.5rem',
+    paddingRight: '1.5rem',
   },
   containerMonthYear: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    margin: 5
+    margin: '0.3rem',
   },
   filter: {
     borderBottomWidth: 1,
-    marginTop: 5,
-    marginBottom: 5,
-    height: 40
+    marginTop: '0.3rem',
+    marginBottom: '0.3rem',
+    height: '3rem',
   },
   date: {
     borderWidth: 1,
     backgroundColor: '#fff',
-    borderRadius: 8,
-    padding: 5,
-    margin: 5,
-    width: 66,
+    borderRadius: '0.5rem',
+    padding: '0.3rem',
+    margin: '0.5rem',
+    width: '4.2rem',
   },
   cards: {
     flexDirection: 'row',

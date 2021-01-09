@@ -1,9 +1,10 @@
 import React from 'react';
-import { Text, View, StyleSheet, TouchableOpacity } from "react-native";
+import { Text, View, TouchableOpacity } from "react-native";
 import { AntDesign as Icon } from '@expo/vector-icons';
 import { useNavigation } from "@react-navigation/native";
 import api from "../services/api";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import EStyleSheet from 'react-native-extended-stylesheet';
 
 const Item = ({ dataFinances, createOrEdit }) => {
 
@@ -53,38 +54,39 @@ const Item = ({ dataFinances, createOrEdit }) => {
   )
 }
 
-const styles = StyleSheet.create({
+const styles = EStyleSheet.create({
   containerRed: {
     flexDirection: 'row',
     borderWidth: 1,
     borderColor: '#ff0000',
-    borderRadius: 10,
-    marginBottom: 5,
-    padding: 5,
+    borderRadius: '0.62rem',
+    marginBottom: '0.3rem',
+    padding: '0.3rem',
     justifyContent: 'space-between'
   },
   containerGreen: {
     flexDirection: 'row',
     borderWidth: 1,
     borderColor: '#00ff00',
-    borderRadius: 10,
-    marginBottom: 5,
-    padding: 5,
+    borderRadius: '0.62rem',
+    marginBottom: '0.3rem',
+    padding: '0.3rem',
     justifyContent: 'space-between'
   },
   containerInfo: {
-    maxWidth: 120
+    maxWidth: '5rem'
   },
   containerCard: {
     justifyContent: 'center',
   },
   day: {
-    fontSize: 20,
-    marginLeft: 5
+    fontSize: '1.5rem',
+    marginLeft: '0.2rem',
+    marginRight: '0.2rem',
   },
   title: {
     fontWeight: 'bold',
-    fontSize: 16
+    fontSize: '1rem',
   },
   value: {
     fontWeight: 'bold'

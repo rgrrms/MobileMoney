@@ -20,6 +20,7 @@ const Routes = () => {
                            component={TimeLine}
                            options={{
                              title: 'MobileMoney',
+                             headerBackAllowFontScaling: true,
                              headerStyle: {
                                backgroundColor: '#192537'
                              },

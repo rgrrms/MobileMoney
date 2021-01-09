@@ -1,5 +1,6 @@
 import React from 'react';
-import { Text, View, StyleSheet } from "react-native";
+import { Text, View } from "react-native";
+import EStyleSheet from 'react-native-extended-stylesheet';
 
 const Values = ({ titleValue, values }) => {
   return (
@@ -10,14 +11,14 @@ const Values = ({ titleValue, values }) => {
   )
 }
 
-const styles = StyleSheet.create({
+const styles = EStyleSheet.create({
   value: {
     borderWidth: 2,
     backgroundColor: '#fff',
-    borderRadius: 8,
-    padding: 5,
-    marginBottom: 5,
-    width: 120,
+    borderRadius: '0.5rem',
+    padding: '0.2rem',
+    marginBottom: '0.2rem',
+    width: '7rem',
     alignItems: 'center'
   },
   valueText: {
