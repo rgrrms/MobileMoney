@@ -48,7 +48,7 @@ const Login = () => {
       <Text style={styles.slogan}>G E R E N C I E   E   C O N Q U I S T E !</Text>
       {/*<Input placeholder="CPF" />*/}
       <TextInput style={styles.input} placeholder="CPF" placeholderTextColor="#fff" value={cpf} minLength={14} maxLength={14} onChangeText={e => handleChange(e)}/>
-      <TextInput style={styles.input} placeholder="Senha" placeholderTextColor="#fff" value={pass} secureTextEntry={true}  onChangeText={e => setPass(e)}/>
+      <TextInput style={styles.input} placeholder="Senha" placeholderTextColor="#fff" value={pass} secureTextEntry={true} onChangeText={e => setPass(e)}/>
       <TouchableOpacity onPress={handleLogin} style={styles.button}>
         <Text style={styles.text}>Login</Text>
         <Icon style={styles.icon} name="login" size={32} color="#34cb79" />
