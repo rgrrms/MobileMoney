@@ -1,7 +1,8 @@
 import React from 'react';
-import { StyleSheet, TouchableOpacity } from "react-native";
+import { TouchableOpacity } from "react-native";
 import { MaterialIcons as Icon } from '@expo/vector-icons';
 import { useNavigation } from "@react-navigation/native";
+import EStyleSheet from 'react-native-extended-stylesheet';
 
 const Header = ({ createOrEdit }) => {
   const navigation = useNavigation();
@@ -12,15 +13,15 @@ const Header = ({ createOrEdit }) => {
 
   return (
       <TouchableOpacity onPress={handleNavigateToCreate}>
-        <Icon style={styles.icon} name="add" size={32} color="#34cb79" />
+        <Icon style={styles.icon} name="add" size={42} color="#34cb79" />
       </TouchableOpacity>
 
   );
 }
 
-const styles = StyleSheet.create({
+const styles = EStyleSheet.create({
   icon: {
-    padding: 5
+    padding: '0.3rem'
   }
 })
 
