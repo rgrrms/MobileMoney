@@ -14,6 +14,7 @@ import api from "../services/api";
 import {useRoute} from "@react-navigation/native";
 import {AntDesign as Icon} from "@expo/vector-icons";
 import { maskAmountBack } from "../utils/maskCPF";
+import {AdMobBanner} from "expo-ads-admob";
 
 const Data = ["11/2020","12/2020","01/2021","02/2021","03/2021","04/2021","05/2021"]
 const DataFormat = ["2020-11","2020-12","2021-01","2021-02","2021-03","2021-04","2021-05"]
@@ -85,6 +86,10 @@ const TimeLine = () => {
     }
   }, [dataFormat]);
 
+  const bannerError = (e) => {
+    alert(e)
+  }
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <ScrollView style={styles.container}>
@@ -115,6 +120,10 @@ const TimeLine = () => {
           })}
         </View>
       </ScrollView>
+      <AdMobBanner
+        bannerSize="smartBanner"
+        adUnitID="ca-app-pub-6552849276772222/8210045785"
+        onDidFailToReceiveAdWithError={(e) => bannerError(e)} />
     </SafeAreaView>
   )
 }
