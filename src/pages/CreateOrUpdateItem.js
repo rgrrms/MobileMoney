@@ -6,7 +6,7 @@ import api from "../services/api";
 import {MaterialCommunityIcons as Icon, FontAwesome as IconF} from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { maskData, maskAmount } from "../utils/maskCPF";
-import { AdMobInterstitial } from 'expo-ads-admob';
+import { AdMobBanner, AdMobInterstitial } from 'expo-ads-admob';
 
 const CreateOrUpdateItem = () => {
   const [category, setCategory] = useState();
@@ -136,6 +136,10 @@ const CreateOrUpdateItem = () => {
     navigation.goBack();
   }
 
+  const bannerError = (e) => {
+    alert(e)
+  }
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <View style={styles.container}>
@@ -172,6 +176,12 @@ const CreateOrUpdateItem = () => {
           </TouchableOpacity>
         </View>
       </View>
+      <View style={styles.banner}>
+        <AdMobBanner
+          bannerSize="smartBanner"
+          adUnitID="ca-app-pub-6552849276772222/8210045785"
+          onDidFailToReceiveAdWithError={(e) => bannerError(e)} />
+      </View>
     </SafeAreaView>
   )
 }
@@ -206,6 +216,9 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 28,
     marginRight: 10,
+  },
+  banner: {
+    alignItems: 'flex-end'
   }
 })
 
