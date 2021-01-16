@@ -16,8 +16,7 @@ import {AntDesign as Icon} from "@expo/vector-icons";
 import { maskAmountBack } from "../utils/maskCPF";
 import {AdMobBanner} from "expo-ads-admob";
 
-const Data = ["11/2020","12/2020","01/2021","02/2021","03/2021","04/2021","05/2021"]
-const DataFormat = ["2020-11","2020-12","2021-01","2021-02","2021-03","2021-04","2021-05"]
+const today = new Date;
 
 const TimeLine = () => {
   const [balance, setBalance] = useState();
@@ -28,30 +27,44 @@ const TimeLine = () => {
   const [finances, setFinances] = useState();
   const [financesFilter, setFinancesFilter] = useState();
 
-  const route = useRoute();
-
-  const [value, setValue] = useState('0')
-
-  const [data, setData] = useState(Data[value]);
-  const [dataFormat, setDataFormat] = useState(DataFormat[Number(value)]);
+  const [data, setData] = useState(`${today.getMonth()+1}/${today.getFullYear()}`);
+  const [dataFormat, setDataFormat] = useState(`${today.getFullYear()}-${today.getMonth()+1}`);
 
   const [filter, setFilter] = useState();
 
+  const route = useRoute();
   const routeParams = route.params;
 
-  function count(sinal) {
-    let v = +value;
+  function monthYear(sinal) {
+    let month = Number(data.split("/")[0]);
+    let year = Number(data.split("/")[1]);
     if (sinal === "+") {
-      v++;
-      setData(Data[v]);
-      setDataFormat(DataFormat[v]);
-      setValue(v);
+      if (month >= 12) {
+        month = '01';
+        year++;
+      } else {
+        if (month < 9) {
+          month++;
+          month = '0' + month;
+        } else {
+          month++;
+        }
+      }
     } else {
-      v--;
-      setData(Data[v]);
-      setDataFormat(DataFormat[v]);
-      setValue(v);
+      if (month <= 1) {
+        month = 12;
+        year--;
+      } else {
+        if (month <= 10) {
+          month--;
+          month = '0' + month;
+        } else {
+          month--;
+        }
+      }
     }
+    setData(`${month}/${year}`);
+    setDataFormat(`${year}-${month}`);
   }
 
   useEffect(() => {
@@ -69,17 +82,17 @@ const TimeLine = () => {
         headers: {
           "x-access-token": routeParams.token
         }}).then(response => {
-        setFinances(response.data)
-        setFinancesFilter(response.data)
+          setFinances(response.data);
+          setFinancesFilter(response.data);
       });
       api.get(`/values/${dataFormat}`, {
         headers: {
           "x-access-token": routeParams.token
         }}).then(response => {
-        setBalance(maskAmountBack(response.data.saldo));
-        setNumberPut(response.data.quantidadeLançamentos);
-        setExpense(maskAmountBack(response.data.despesa));
-        setRevenue(maskAmountBack(response.data.receita));
+          setBalance(maskAmountBack(response.data.saldo));
+          setNumberPut(response.data.quantidadeLançamentos);
+          setExpense(maskAmountBack(response.data.despesa));
+          setRevenue(maskAmountBack(response.data.receita));
       });
     } catch (e) {
       alert(e.response.data.message)
@@ -94,11 +107,11 @@ const TimeLine = () => {
     <SafeAreaView style={{ flex: 1 }}>
       <ScrollView style={styles.container}>
         <View style={styles.containerMonthYear}>
-          <TouchableOpacity onPress={() => count("-")}>
+          <TouchableOpacity onPress={() => monthYear("-")}>
             <Icon name="leftcircle" size={32} color="#34cb79" />
           </TouchableOpacity>
           <Text style={styles.date}>{data}</Text>
-          <TouchableOpacity onPress={() => count("+")}>
+          <TouchableOpacity onPress={() => monthYear("+")}>
             <Icon name="rightcircle" size={32} color="#34cb79" />
           </TouchableOpacity>
         </View>
