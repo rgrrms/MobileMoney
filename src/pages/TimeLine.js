@@ -3,13 +3,13 @@ import { SafeAreaView, Text, View, ScrollView, TouchableOpacity, TextInput } fro
 import Values from "../components/Values";
 import Item from "../components/Item";
 import api from "../services/api";
-import {useRoute} from "@react-navigation/native";
+import {useNavigation, useRoute} from "@react-navigation/native";
 import {AntDesign as Icon} from "@expo/vector-icons";
 import { maskAmountBack } from "../utils/maskCPF";
 import EStyleSheet from 'react-native-extended-stylesheet';
+import {AdMobBanner} from "expo-ads-admob";
 
-const Data = ["11/2020","12/2020","01/2021","02/2021","03/2021","04/2021","05/2021"]
-const DataFormat = ["2020-11","2020-12","2021-01","2021-02","2021-03","2021-04","2021-05"]
+const today = new Date;
 
 const TimeLine = () => {
   const [balance, setBalance] = useState();
@@ -22,29 +22,61 @@ const TimeLine = () => {
 
   const route = useRoute();
 
-  const [value, setValue] = useState('0')
+  const navigation = useNavigation();
 
-  const [data, setData] = useState(Data[value]);
-  const [dataFormat, setDataFormat] = useState(DataFormat[Number(value)]);
+  const [value, setValue] = useState('0')
 
   const [filter, setFilter] = useState();
 
+  const [updateNewList, setUpdateNewList] = useState(0);
+
+  const [data, setData] = useState(`${today.getMonth()+1}/${today.getFullYear()}`);
+  const [dataFormat, setDataFormat] = useState(`${today.getFullYear()}-${today.getMonth()+1}`);
+  
   const routeParams = route.params;
 
-  function count(sinal) {
-    let v = +value;
+  function monthYear(sinal) {
+    let month = Number(data.split("/")[0]);
+    let year = Number(data.split("/")[1]);
     if (sinal === "+") {
-      v++;
-      setData(Data[v]);
-      setDataFormat(DataFormat[v]);
-      setValue(v);
+      if (month >= 12) {
+        month = '01';
+        year++;
+      } else {
+        if (month < 9) {
+          month++;
+          month = '0' + month;
+        } else {
+          month++;
+        }
+      }
     } else {
-      v--;
-      setData(Data[v]);
-      setDataFormat(DataFormat[v]);
-      setValue(v);
+      if (month <= 1) {
+        month = 12;
+        year--;
+      } else {
+        if (month <= 10) {
+          month--;
+          month = '0' + month;
+        } else {
+          month--;
+        }
+      }
     }
+    setData(`${month}/${year}`);
+    setDataFormat(`${year}-${month}`);
   }
+
+  function reloadDeleted() {
+    setUpdateNewList(updateNewList + 1);
+  }
+
+  useEffect(() => {
+    navigation.addListener('focus', ()=> {
+      console.log(routeParams)
+      routeParams.updateList == true ? setUpdateNewList(updateNewList + 1) : false;
+    })
+  }, []);
 
   useEffect(() => {
     const search = filter;
@@ -61,32 +93,36 @@ const TimeLine = () => {
         headers: {
           "x-access-token": routeParams.token
         }}).then(response => {
-        setFinances(response.data)
-        setFinancesFilter(response.data)
+          setFinances(response.data);
+          setFinancesFilter(response.data);
       });
       api.get(`/values/${dataFormat}`, {
         headers: {
           "x-access-token": routeParams.token
         }}).then(response => {
-        setBalance(maskAmountBack(response.data.saldo));
-        setNumberPut(response.data.quantidadeLançamentos);
-        setExpense(maskAmountBack(response.data.despesa));
-        setRevenue(maskAmountBack(response.data.receita));
+          setBalance(maskAmountBack(response.data.saldo));
+          setNumberPut(response.data.quantidadeLançamentos);
+          setExpense(maskAmountBack(response.data.despesa));
+          setRevenue(maskAmountBack(response.data.receita));
       });
     } catch (e) {
       alert(e.response.data.message)
     }
-  }, [dataFormat]);
+  }, [dataFormat, updateNewList]);
+
+  const bannerError = (e) => {
+    alert(e)
+  }
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <ScrollView style={styles.container}>
         <View style={styles.containerMonthYear}>
-          <TouchableOpacity onPress={() => count("-")}>
+          <TouchableOpacity onPress={() => monthYear("-")}>
             <Icon name="leftcircle" size={32} color="#34cb79" />
           </TouchableOpacity>
           <Text style={styles.date}>{data}</Text>
-          <TouchableOpacity onPress={() => count("+")}>
+          <TouchableOpacity onPress={() => monthYear("+")}>
             <Icon name="rightcircle" size={32} color="#34cb79" />
           </TouchableOpacity>
         </View>
@@ -103,11 +139,15 @@ const TimeLine = () => {
         <View style={styles.list}>
           {financesFilter?.map(item => {
             return (
-              <Item key={item._id} dataFinances={item} tokenParams={routeParams} createOrEdit={"edit"}/>
+              <Item key={item._id} dataFinances={item} tokenParams={routeParams} functionReloadDeleted={reloadDeleted} createOrEdit={"edit"}/>
             )
           })}
         </View>
       </ScrollView>
+      <AdMobBanner
+        bannerSize="smartBanner"
+        adUnitID="ca-app-pub-6552849276772222/8210045785"
+        onDidFailToReceiveAdWithError={(e) => bannerError(e)} />
     </SafeAreaView>
   )
 }

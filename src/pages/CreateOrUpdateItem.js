@@ -7,6 +7,7 @@ import {MaterialCommunityIcons as Icon, FontAwesome as IconF} from "@expo/vector
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { maskData, maskAmount } from "../utils/maskCPF";
 import EStyleSheet from 'react-native-extended-stylesheet';
+import { AdMobBanner, AdMobInterstitial } from 'expo-ads-admob';
 
 const CreateOrUpdateItem = () => {
   const [category, setCategory] = useState();
@@ -22,6 +23,11 @@ const CreateOrUpdateItem = () => {
   const navigation = useNavigation();
 
   useEffect(() => {
+    (async function loadAd(){
+      await AdMobInterstitial.setAdUnitID('ca-app-pub-6552849276772222/9838748846');
+      await fullAd();
+    })();
+
     AsyncStorage.getItem('token').then(token => {
       if (routeParams.createOrEdit !== 'create') {
         try {
@@ -41,8 +47,17 @@ const CreateOrUpdateItem = () => {
           alert(e.response.data.message)
         }
       }
-    })
-  }, [])
+    });
+  }, []);
+
+  async function fullAd(){
+    await AdMobInterstitial.requestAdAsync({ servePersonalizedAds: true });
+    try {
+      await AdMobInterstitial.showAdAsync();
+    } catch (e) {
+      console.log(e);
+    }
+  }
 
   async function handleCreateItem(e) {
     e.preventDefault();
@@ -73,7 +88,7 @@ const CreateOrUpdateItem = () => {
             }
           }).then(response => {
             alert("Dados salvos com sucesso!");
-            navigation.navigate('TimeLine');
+            navigation.navigate('TimeLine', {updateList: true});
           });
         } catch (e) {
           alert(e.response.data.message)
@@ -98,7 +113,7 @@ const CreateOrUpdateItem = () => {
             }
           }).then(response => {
             alert("Dados salvos com sucesso!");
-            navigation.navigate('TimeLine');
+            navigation.navigate('TimeLine', {updateList: true});
           });
         } catch (e) {
           alert(e.response.data.message)
@@ -120,6 +135,10 @@ const CreateOrUpdateItem = () => {
   function handleReturn(e) {
     e.preventDefault();
     navigation.goBack();
+  }
+
+  const bannerError = (e) => {
+    alert(e)
   }
 
   return (
@@ -160,6 +179,12 @@ const CreateOrUpdateItem = () => {
           </View>
         </View>
       </ScrollView>
+      <View style={styles.banner}>
+        <AdMobBanner
+          bannerSize="smartBanner"
+          adUnitID="ca-app-pub-6552849276772222/8210045785"
+          onDidFailToReceiveAdWithError={(e) => bannerError(e)} />
+      </View>
     </SafeAreaView>
   )
 }
@@ -194,6 +219,11 @@ const styles = EStyleSheet.create({
   text: {
     fontSize: '1.75rem',
     marginRight: '0.62rem',
+    fontSize: 28,
+    marginRight: 10,
+  },
+  banner: {
+    alignItems: 'flex-end'
   }
 })
 
