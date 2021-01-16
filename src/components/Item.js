@@ -5,7 +5,7 @@ import { useNavigation } from "@react-navigation/native";
 import api from "../services/api";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const Item = ({ dataFinances, createOrEdit }) => {
+const Item = ({ dataFinances, createOrEdit, functionReloadDeleted }) => {
 
   const navigation = useNavigation();
 
@@ -21,6 +21,7 @@ const Item = ({ dataFinances, createOrEdit }) => {
           "x-access-token": token
         }}).then(r => {
         alert(r.data.message);
+        functionReloadDeleted();
       });
     } catch (e) {
       alert(e.response.data.message)

@@ -22,6 +22,11 @@ const CreateOrUpdateItem = () => {
   const navigation = useNavigation();
 
   useEffect(() => {
+    (async function loadAd(){
+      await AdMobInterstitial.setAdUnitID('ca-app-pub-6552849276772222/9838748846');
+      await fullAd();
+    })();
+
     AsyncStorage.getItem('token').then(token => {
       if (routeParams.createOrEdit !== 'create') {
         try {
@@ -42,11 +47,6 @@ const CreateOrUpdateItem = () => {
         }
       }
     });
-
-    (async function loadAd(){
-      await AdMobInterstitial.setAdUnitID('ca-app-pub-6552849276772222/9838748846');
-      await fullAd();
-    })();
   }, []);
 
   async function fullAd(){
@@ -87,7 +87,7 @@ const CreateOrUpdateItem = () => {
             }
           }).then(response => {
             alert("Dados salvos com sucesso!");
-            navigation.navigate('TimeLine');
+            navigation.navigate('TimeLine', {updateList: true});
           });
         } catch (e) {
           alert(e.response.data.message)
@@ -112,7 +112,7 @@ const CreateOrUpdateItem = () => {
             }
           }).then(response => {
             alert("Dados salvos com sucesso!");
-            navigation.navigate('TimeLine');
+            navigation.navigate('TimeLine', {updateList: true});
           });
         } catch (e) {
           alert(e.response.data.message)

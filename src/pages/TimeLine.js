@@ -11,7 +11,7 @@ import {
 import Values from "../components/Values";
 import Item from "../components/Item";
 import api from "../services/api";
-import {useRoute} from "@react-navigation/native";
+import {useNavigation, useRoute} from "@react-navigation/native";
 import {AntDesign as Icon} from "@expo/vector-icons";
 import { maskAmountBack } from "../utils/maskCPF";
 import {AdMobBanner} from "expo-ads-admob";
@@ -27,12 +27,19 @@ const TimeLine = () => {
   const [finances, setFinances] = useState();
   const [financesFilter, setFinancesFilter] = useState();
 
-  const [data, setData] = useState(`${today.getMonth()+1}/${today.getFullYear()}`);
-  const [dataFormat, setDataFormat] = useState(`${today.getFullYear()}-${today.getMonth()+1}`);
+  const route = useRoute();
+
+  const navigation = useNavigation();
+
+  const [value, setValue] = useState('0')
 
   const [filter, setFilter] = useState();
 
-  const route = useRoute();
+  const [updateNewList, setUpdateNewList] = useState(0);
+
+  const [data, setData] = useState(`${today.getMonth()+1}/${today.getFullYear()}`);
+  const [dataFormat, setDataFormat] = useState(`${today.getFullYear()}-${today.getMonth()+1}`);
+  
   const routeParams = route.params;
 
   function monthYear(sinal) {
@@ -67,6 +74,17 @@ const TimeLine = () => {
     setDataFormat(`${year}-${month}`);
   }
 
+  function reloadDeleted() {
+    setUpdateNewList(updateNewList + 1);
+  }
+
+  useEffect(() => {
+    navigation.addListener('focus', ()=> {
+      console.log(routeParams)
+      routeParams.updateList == true ? setUpdateNewList(updateNewList + 1) : false;
+    })
+  }, []);
+
   useEffect(() => {
     const search = filter;
     const searchLower = search?.toLowerCase();
@@ -97,7 +115,7 @@ const TimeLine = () => {
     } catch (e) {
       alert(e.response.data.message)
     }
-  }, [dataFormat]);
+  }, [dataFormat, updateNewList]);
 
   const bannerError = (e) => {
     alert(e)
@@ -128,7 +146,7 @@ const TimeLine = () => {
         <View style={styles.list}>
           {financesFilter?.map(item => {
             return (
-              <Item key={item._id} dataFinances={item} tokenParams={routeParams} createOrEdit={"edit"}/>
+              <Item key={item._id} dataFinances={item} tokenParams={routeParams} functionReloadDeleted={reloadDeleted} createOrEdit={"edit"}/>
             )
           })}
         </View>
